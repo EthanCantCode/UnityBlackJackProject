@@ -19,5 +19,5 @@ A 3D blackjack game built in Unity for **UNT CSCE 1010**.
 ## Credits & Assets
 | Asset | Source |
 |-------|--------|
-| Playing card art | [hayeah/playing-cards-assets](https://github.com/hayeah/playing-cards-assets) |
+| Playing card art | [Art_Bickles](https://art-bickles.itch.io/playing-cards)) |
 | Blackjack table 3D model | [Sketchfab](https://sketchfab.com/3d-models/blackjack-table-baf7e3cbd14140ca81ea1a79d28fb635) |
