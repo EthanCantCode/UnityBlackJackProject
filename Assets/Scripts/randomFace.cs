@@ -10,6 +10,8 @@ public class randomFace : MonoBehaviour
 
     public GameObject cardPrefab;
 
+    public int testScore;
+
     // How far apart each new card spawns along the X axis
     public float cardSpacing = 0.7f;
 
@@ -27,9 +29,12 @@ public class randomFace : MonoBehaviour
             Vector3 spawnPosition = new Vector3(cardsSpawned * cardSpacing, 0, 0);
             SpawnCard(spawnPosition);
 
-        }
+        }  
+        
+    }
 
-        // Spawns a card at the given position and gives it a random face
+
+    // Spawns a card at the given position and gives it a random face
         void SpawnCard(Vector3 position)
         {
             // Create a copy of the prefab in the scene
@@ -52,18 +57,37 @@ public class randomFace : MonoBehaviour
             string[] cardParts = cardName.Split('_'); //Spilts the card name
             string cardValue = cardParts[0];
 
-            Debug.Log(cardValue);//This can be deleted in the future
+            int blackjackValue = cardCalc(cardValue);
+            Debug.Log(cardName + " = " + blackjackValue);
+            testScore += blackjackValue;
 
-            
-
-            
             
             
             
          }
 
-
+    int cardCalc(string cardAmt)
+        {
+            
+        if (cardAmt == "ace")
+        {
+            return 11; 
+        }
+        
+        else if (cardAmt == "jack" || cardAmt == "queen" || cardAmt == "king")
+        {
+            return 10;
+        }
+        
+        else
+        {    
+            return int.Parse(cardAmt);  
+        }
 
         
-    }
+
+        }
+
+
+
 }
