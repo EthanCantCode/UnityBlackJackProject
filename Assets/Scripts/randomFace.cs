@@ -50,9 +50,9 @@ public class randomFace : MonoBehaviour
             //This logs the name of the randomly selected card face
             string cardName = cardFace[randomIndex].name;
             string[] cardParts = cardName.Split('_'); //Spilts the card name
-            string rank = cardParts[0];
+            string cardValue = cardParts[0];
 
-            Debug.Log(rank);
+            Debug.Log(cardValue);//This can be deleted in the future
 
             
 
