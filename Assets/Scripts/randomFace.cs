@@ -58,10 +58,25 @@ public class randomFace : MonoBehaviour
             string cardValue = cardParts[0];
 
             int blackjackValue = cardCalc(cardValue);
-            Debug.Log(cardName + " = " + blackjackValue);
+            //Debug.Log(cardName + " = " + blackjackValue);
             testScore += blackjackValue;
 
-            
+
+            //Basic blackjack check (will probably be removed in the future)
+            if (testScore > 21)
+            {   
+                testScore = 0;
+                Debug.Log("bust");
+            }
+            else if(testScore == 21)
+            {
+                Debug.Log("BLACKJACK");
+            }
+            else
+            {
+                Debug.Log("Your score is " + testScore);
+            }
+
             
             
          }
@@ -72,18 +87,15 @@ public class randomFace : MonoBehaviour
         if (cardAmt == "ace")
         {
             return 11; 
-        }
-        
+        }        
         else if (cardAmt == "jack" || cardAmt == "queen" || cardAmt == "king")
         {
             return 10;
         }
-        
         else
         {    
             return int.Parse(cardAmt);  
         }
-
         
 
         }
