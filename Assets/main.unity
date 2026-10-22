@@ -395,6 +395,10 @@ PrefabInstance:
       propertyPath: cardPrefab
       value: 
       objectReference: {fileID: 8022546526600944340, guid: dba63bb9ae892964a802f30d6181d13e, type: 3}
+    - target: {fileID: 65961745841847867, guid: d8b712bd5433a463694b66be4244a138, type: 3}
+      propertyPath: cardSpacing
+      value: 0.1
+      objectReference: {fileID: 0}
     - target: {fileID: 5635936544661629819, guid: d8b712bd5433a463694b66be4244a138, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
