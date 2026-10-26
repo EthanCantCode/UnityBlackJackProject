@@ -67,5 +67,5 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "UnityBlackJackProject.slnx"
+    "dotnet.defaultSolution": "My project.slnx"
 }

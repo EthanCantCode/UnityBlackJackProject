@@ -115,3 +115,4 @@ InitTestScene*.unity*
 .DS_Store
 .vscode/
 .idea/
+.vscode/settings.json
