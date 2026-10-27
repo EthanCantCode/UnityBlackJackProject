@@ -7,8 +7,10 @@ public class randomFace : MonoBehaviour
     //Array that hold all of the Card assets
     public Texture2D[] cardFace;
     
-
     public GameObject cardPrefab;
+
+    //Object on where the cards where spawn
+    public GameObject cardSpawn;
 
     public int pScore;//Player score
     public int dScore;//Dealer score
@@ -28,7 +30,7 @@ public class randomFace : MonoBehaviour
         if (Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             
-            Vector3 spawnPosition = new Vector3(pCardsSpawned * cardSpacing, 0, 0);
+            Vector3 spawnPosition = cardSpawn.transform.position + new Vector3(pCardsSpawned * cardSpacing, 0, 0);
             SpawnCard(spawnPosition);
 
         }
@@ -36,7 +38,7 @@ public class randomFace : MonoBehaviour
         //Spawns a dealer card when the key "d" is pressed
         if (Keyboard.current.dKey.wasPressedThisFrame)
         {
-            Vector3 dSpawnPosition = new Vector3(dCardsSpawned * cardSpacing, 0, -2);
+            Vector3 dSpawnPosition = cardSpawn.transform.position + new Vector3(dCardsSpawned * cardSpacing, 0, 0);
             spawnDealer(dSpawnPosition);
         }  
         
