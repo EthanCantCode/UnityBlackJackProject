@@ -1,5 +1,7 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 
 public class randomFace : MonoBehaviour
@@ -12,6 +14,10 @@ public class randomFace : MonoBehaviour
     //Object on where the cards where spawn
     public GameObject cardSpawn;
 
+    //Dealing animation
+    public Animation drawCard;
+    public float dealTime;
+
     public int pScore;//Player score
     public int dScore;//Dealer score
 
@@ -22,23 +28,33 @@ public class randomFace : MonoBehaviour
     private int pCardsSpawned = 0;
     private int dCardsSpawned = 0;
 
-    void Start()
+    IEnumerator Start()
     {
-
-            //Sets spawn location
-            Vector3 pStartspawn = cardSpawn.transform.position + new Vector3(pCardsSpawned * cardSpacing, 0, 0);
-            Vector3 dStartspawn = cardSpawn.transform.position + new Vector3(dCardsSpawned * cardSpacing, 0, 0);
-
-            
-            SpawnCard(pStartspawn);
-            spawnDealer(dStartspawn);
-            SpawnCard(pStartspawn);
-            spawnDealer(dStartspawn);
-            
-
         
+           
+            
 
+            for(int i = 0; i < 2; i++)
+        {
+            Vector3 spawnPosition = cardSpawn.transform.position + new Vector3(pCardsSpawned * cardSpacing, 0, 0);
+            SpawnCard(spawnPosition);
+            drawCard.Stop();
+            drawCard.Play("draw");
+            yield return new WaitForSeconds(drawCard["draw"].length);
+            Debug.Log("drew player card");
 
+            Vector3 dSpawnPosition = cardSpawn.transform.position + new Vector3(dCardsSpawned * cardSpacing, 0, 0);
+            spawnDealer(dSpawnPosition);
+            drawCard.Stop();
+            drawCard.Play("draw");
+            yield return new WaitForSeconds(drawCard["draw"].length);
+            Debug.Log("Drew dealer card");
+
+        }
+
+        drawCard.Play("RightIdle");
+            
+        
     }
 
 
@@ -69,7 +85,7 @@ public class randomFace : MonoBehaviour
         void SpawnCard(Vector3 position)
         {
             // Create a copy of the prefab in the scene
-            GameObject newCard = Instantiate(cardPrefab, position, Quaternion.identity);
+            GameObject newCard = Instantiate(cardPrefab, position, Quaternion.Euler(0,180,0));
 
             // Pick a random index from 0 to 51 (max is excluded for ints)
             int randomIndex = Random.Range(0, cardFace.Length);
@@ -94,19 +110,19 @@ public class randomFace : MonoBehaviour
 
 
             //Basic blackjack check (will probably be removed in the future)
-            if (pScore > 21)
-            {   
-                pScore = 0;
-                Debug.Log("bust");
-            }
-            else if(pScore == 21)
-            {
-                Debug.Log("BLACKJACK");
-            }
-            else
-            {
-                Debug.Log("Your score is " + pScore);
-            }
+            // if (pScore > 21)
+            // {   
+            //     pScore = 0;
+            //     Debug.Log("bust");
+            // }
+            // else if(pScore == 21)
+            // {
+            //     Debug.Log("BLACKJACK");
+            // }
+            // else
+            // {
+            //     Debug.Log("Your score is " + pScore);
+            // }
 
             
             
@@ -118,7 +134,7 @@ public class randomFace : MonoBehaviour
     void spawnDealer(Vector3 position)
     {
         
-            GameObject newCard = Instantiate(cardPrefab, position, Quaternion.identity);
+            GameObject newCard = Instantiate(cardPrefab, position, Quaternion.Euler(0,180,0));
 
             // Pick a random index from 0 to 51 (max is excluded for ints)
             int randomIndex = Random.Range(0, cardFace.Length);
@@ -142,19 +158,19 @@ public class randomFace : MonoBehaviour
 
 
             //Basic blackjack check (will probably be removed in the future)
-            if (dScore > 21)
-            {   
-                dScore = 0;
-                Debug.Log("Dealer bust");
-            }
-            else if(dScore == 21)
-            {
-                Debug.Log("Dealer BLACKJACK");
-            }
-            else
-            {
-                Debug.Log("Dealer score is " + dScore);
-            }
+            // if (dScore > 21)
+            // {   
+            //     dScore = 0;
+            //     Debug.Log("Dealer bust");
+            // }
+            // else if(dScore == 21)
+            // {
+            //     Debug.Log("Dealer BLACKJACK");
+            // }
+            // else
+            // {
+            //     Debug.Log("Dealer score is " + dScore);
+            // }
 
 
     }

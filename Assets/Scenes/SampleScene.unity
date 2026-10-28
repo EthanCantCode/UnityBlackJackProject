@@ -226,7 +226,7 @@ Transform:
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 839969658}
-  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 180}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 172.9904}
 --- !u!212 &729839362
 SpriteRenderer:
   serializedVersion: 3
@@ -301,7 +301,7 @@ Animation:
   - {fileID: 7400000, guid: c5f1ce0915dca4948bb8b8bee940cab8, type: 2}
   - {fileID: 7400000, guid: b7bc7f707d1264f998c42c0f93acab92, type: 2}
   m_WrapMode: 0
-  m_PlayAutomatically: 1
+  m_PlayAutomatically: 0
   m_AnimatePhysics: 0
   m_UpdateMode: 0
   m_CullingType: 0
