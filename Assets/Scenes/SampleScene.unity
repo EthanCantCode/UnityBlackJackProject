@@ -204,6 +204,7 @@ GameObject:
   m_Component:
   - component: {fileID: 729839361}
   - component: {fileID: 729839362}
+  - component: {fileID: 729839363}
   m_Layer: 0
   m_Name: rightHand
   m_TagString: Untagged
@@ -286,6 +287,24 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!111 &729839363
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 729839360}
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Animation: {fileID: 0}
+  m_Animations:
+  - {fileID: 7400000, guid: c5f1ce0915dca4948bb8b8bee940cab8, type: 2}
+  - {fileID: 7400000, guid: 11c8807b6e86f4cc0be103ab32d8bdd3, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 0
+  m_AnimatePhysics: 0
+  m_UpdateMode: 0
+  m_CullingType: 0
 --- !u!1 &733521619
 GameObject:
   m_ObjectHideFlags: 0
@@ -879,6 +898,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2027101088}
   - component: {fileID: 2027101089}
+  - component: {fileID: 2027101090}
   m_Layer: 0
   m_Name: leftHand
   m_TagString: Untagged
@@ -961,6 +981,22 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!111 &2027101090
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2027101087}
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Animation: {fileID: 0}
+  m_Animations: []
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_UpdateMode: 0
+  m_CullingType: 0
 --- !u!1001 &3637883727906956553
 PrefabInstance:
   m_ObjectHideFlags: 0
