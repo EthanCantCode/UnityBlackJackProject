@@ -22,6 +22,26 @@ public class randomFace : MonoBehaviour
     private int pCardsSpawned = 0;
     private int dCardsSpawned = 0;
 
+    void Start()
+    {
+
+            //Sets spawn location
+            Vector3 pStartspawn = cardSpawn.transform.position + new Vector3(pCardsSpawned * cardSpacing, 0, 0);
+            Vector3 dStartspawn = cardSpawn.transform.position + new Vector3(dCardsSpawned * cardSpacing, 0, 0);
+
+            
+            SpawnCard(pStartspawn);
+            spawnDealer(dStartspawn);
+            SpawnCard(pStartspawn);
+            spawnDealer(dStartspawn);
+            
+
+        
+
+
+    }
+
+
 
     // Update is called once per frame
     void Update()
