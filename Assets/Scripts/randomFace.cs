@@ -1,7 +1,8 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using System.Collections;
+using System.Collections.Generic;
+
 
 
 public class randomFace : MonoBehaviour
@@ -13,6 +14,20 @@ public class randomFace : MonoBehaviour
 
     //Object on where the cards where spawn
     public GameObject cardSpawn;
+
+    public Transform playerHand;
+    public Transform dealerHand;
+
+    public float moveSpeed = 5f;
+
+    // Every card currently in each hand (used to shift them over)
+    public List<GameObject> playerCards = new List<GameObject>();
+    public List<GameObject> dealerCards = new List<GameObject>();
+
+// True while a card is being dealt, so the player can't hit mid-deal
+    public bool isDealing = false;
+
+    public bool isFaceDown = true;
 
     //Dealing animation
     public Animation drawCard;
@@ -37,7 +52,7 @@ public class randomFace : MonoBehaviour
             for(int i = 0; i < 2; i++)
         {
             Vector3 spawnPosition = cardSpawn.transform.position + new Vector3(pCardsSpawned * cardSpacing, 0, 0);
-            SpawnCard(spawnPosition);
+            spawnCard(spawnPosition);
             drawCard.Stop();
             drawCard.Play("draw");
             yield return new WaitForSeconds(drawCard["draw"].length);
@@ -50,12 +65,11 @@ public class randomFace : MonoBehaviour
             yield return new WaitForSeconds(drawCard["draw"].length);
             Debug.Log("Drew dealer card");
 
-        }
-
-        drawCard.Play("RightIdle");
+        }  
             
         
     }
+
 
 
 
@@ -67,7 +81,7 @@ public class randomFace : MonoBehaviour
         {
             
             Vector3 spawnPosition = cardSpawn.transform.position + new Vector3(pCardsSpawned * cardSpacing, 0, 0);
-            SpawnCard(spawnPosition);
+            spawnCard(spawnPosition);
 
         }
 
@@ -82,7 +96,7 @@ public class randomFace : MonoBehaviour
 
 
     // Spawns a card at the given position and gives it a random face
-        void SpawnCard(Vector3 position)
+        void spawnCard(Vector3 position)
         {
             // Create a copy of the prefab in the scene
             GameObject newCard = Instantiate(cardPrefab, position, Quaternion.Euler(0,180,0));
