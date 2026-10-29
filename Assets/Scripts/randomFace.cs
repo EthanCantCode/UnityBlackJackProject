@@ -265,6 +265,8 @@ IEnumerator DealCard(bool toPlayer)
     }
 
     drawCard.Stop();
+    drawCard["RightIdle"].wrapMode = WrapMode.Loop;
+    drawCard.Play("RightIdle");
     isDealing = false;
 }
 
