@@ -43,31 +43,36 @@ public class randomFace : MonoBehaviour
     private int pCardsSpawned = 0;
     private int dCardsSpawned = 0;
 
-    IEnumerator Start()
+    void Start()
+    {
+           
+        StartCoroutine(startOfRound());
+        
+    }
+
+    IEnumerator startOfRound()
     {
         
-           
-            
-
-            for(int i = 0; i < 2; i++)
+        for(int i = 0; i < 2; i++)
         {
             Vector3 spawnPosition = cardSpawn.transform.position + new Vector3(pCardsSpawned * cardSpacing, 0, 0);
             spawnCard(spawnPosition);
             drawCard.Stop();
             drawCard.Play("draw");
+            
             yield return new WaitForSeconds(drawCard["draw"].length);
             Debug.Log("drew player card");
 
             Vector3 dSpawnPosition = cardSpawn.transform.position + new Vector3(dCardsSpawned * cardSpacing, 0, 0);
-            spawnDealer(dSpawnPosition);
+            spawnDealer(dSpawnPosition); 
             drawCard.Stop();
             drawCard.Play("draw");
             yield return new WaitForSeconds(drawCard["draw"].length);
             Debug.Log("Drew dealer card");
 
         }  
-            
-        
+        drawCard.Stop();
+
     }
 
 
@@ -90,6 +95,13 @@ public class randomFace : MonoBehaviour
         {
             Vector3 dSpawnPosition = cardSpawn.transform.position + new Vector3(dCardsSpawned * cardSpacing, 0, 0);
             spawnDealer(dSpawnPosition);
+        } 
+
+        //Replays the round.
+        if (Keyboard.current.rKey.wasPressedThisFrame)
+        {
+            StartCoroutine(startOfRound());
+            Debug.Log("R was pressed");
         }  
         
     }
@@ -138,9 +150,11 @@ public class randomFace : MonoBehaviour
             //     Debug.Log("Your score is " + pScore);
             // }
 
+
             
             
          }
+
 
 
 
