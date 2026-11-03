@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
@@ -40,10 +41,16 @@ public class roundControl : MonoBehaviour
     // How long the result and the cards stay up before the table clears
     public float resultShowTime = 1.5f;
 
-    // Left hand, with Ethan's NewRound clip: it reaches down and sweeps across the table between rounds.
-    // The cards are cleared at sweepClearTime, when the sweep reaches the far side
+    // Left hand, with Ethan's NewRound clip. Times are seconds into the clip:
+    //   sweepStartTime  the hand reaches the table and starts sweeping - each card disappears as the hand passes it
+    //   sweepClearTime  the sweep reaches the far side - anything left is cleared
+    // After that, the wallet counts up or down when the hand passes over it on screen
     public Animation leftHand;
+    public float sweepStartTime = 0.33f;
     public float sweepClearTime = 0.67f;
+
+    // How long the wallet takes to count to its new amount
+    public float walletCountTime = 0.6f;
 
     // How much the DEAL button grows and shrinks while it's waiting to be pressed
     public float dealPulseSize = 0.06f;
@@ -191,7 +198,9 @@ public class roundControl : MonoBehaviour
         // Show the dealer's whole hand at the end, even when the player busted
         cards.RevealHiddenCard();
         Debug.Log("Round over: " + result + " (you " + cards.pScore + ", dealer " + cards.dScore + ")");
-        money.ResolveRound(result);
+        // Work out the payout now (the result text needs it), but the dashboard
+        // only shows it when the hand wipes over the wallet
+        money.ResolveRound(result, false);
         StartCoroutine(ShowResult(result));
     }
 
@@ -247,14 +256,16 @@ public class roundControl : MonoBehaviour
         }
     }
 
-    // Plays the left hand's NewRound sweep and clears the cards as it passes over them.
-    // Without the hand (or the clip), the cards are just cleared
+    // Plays the left hand's NewRound clip: it sweeps the cards off the table as it touches them,
+    // then wipes over the wallet, which is when the dashboard updates.
+    // Without the hand (or the clip), the table just clears and the dashboard updates
     IEnumerator SweepTable()
     {
         AnimationState sweep = leftHand != null ? leftHand["NewRound"] : null;
         if (sweep == null)
         {
             cards.ResetHands();
+            StartCoroutine(money.CountWallet(walletCountTime));
             yield break;
         }
 
@@ -262,13 +273,93 @@ public class roundControl : MonoBehaviour
         sweep.wrapMode = WrapMode.Once;
         leftHand.Stop();
         leftHand.Play("NewRound");
+        float started = Time.time;
 
-        yield return new WaitForSeconds(sweepClearTime);
+        // Hand comes down onto the table
+        yield return new WaitForSeconds(sweepStartTime);
+        Vector3 sweepStart = leftHand.transform.position;
+
+        // Hide each card once the hand has moved past it along the sweep
+        while (Time.time - started < sweepClearTime)
+        {
+            Vector3 travel = leftHand.transform.position - sweepStart;
+            HidePassedCards(cards.playerCards, sweepStart, travel);
+            HidePassedCards(cards.dealerCards, sweepStart, travel);
+            yield return null;
+        }
         cards.ResetHands();
-        yield return new WaitForSeconds(Mathf.Max(0f, sweep.length - sweepClearTime));
 
+        // Hand wipes over the wallet: count the winnings in (or the bet out)
+        yield return StartCoroutine(WaitForWalletPass(started, sweep.length));
+        StartCoroutine(money.CountWallet(walletCountTime));
+
+        // Let the hand get back to its starting spot, then idle
+        yield return new WaitForSeconds(Mathf.Max(0f, sweep.length - (Time.time - started)));
         leftHand["Idle"].wrapMode = WrapMode.Loop;
         leftHand.Play("Idle");
+    }
+
+    // Waits until the hand touches the wallet box on screen, or has passed its closest point to it.
+    // If neither happens, it waits until the clip ends
+    IEnumerator WaitForWalletPass(float started, float clipLength)
+    {
+        RectTransform box = money.walletText != null ? money.walletText.rectTransform : null;
+        Camera cam = Camera.main;
+        if (box == null || cam == null)
+        {
+            yield break;
+        }
+
+        Canvas canvas = box.GetComponentInParent<Canvas>().rootCanvas;
+        Camera uiCamera = canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera;
+        Vector2 walletPoint = RectTransformUtility.WorldToScreenPoint(uiCamera, box.position);
+
+        // "Closest point" only counts once the hand has actually come towards the wallet,
+        // and has then moved away again by a noticeable amount
+        float margin = Screen.height * 0.05f;
+        float startDistance = -1f;
+        float closest = float.MaxValue;
+
+        while (Time.time - started < clipLength)
+        {
+            Vector2 handPoint = cam.WorldToScreenPoint(leftHand.transform.position);
+            if (RectTransformUtility.RectangleContainsScreenPoint(box, handPoint, uiCamera))
+            {
+                yield break;
+            }
+
+            float distance = Vector2.Distance(handPoint, walletPoint);
+            if (startDistance < 0f)
+            {
+                startDistance = distance;
+            }
+            closest = Mathf.Min(closest, distance);
+
+            bool approached = closest < startDistance - margin;
+            if (approached && distance > closest + margin)
+            {
+                yield break;
+            }
+            yield return null;
+        }
+    }
+
+    // A card counts as touched once the hand has travelled at least as far along the sweep as the card is
+    void HidePassedCards(List<GameObject> hand, Vector3 sweepStart, Vector3 travel)
+    {
+        if (travel.sqrMagnitude < 0.0001f)
+        {
+            return;
+        }
+
+        Vector3 direction = travel.normalized;
+        foreach (GameObject card in hand)
+        {
+            if (Vector3.Dot(card.transform.position - sweepStart, direction) <= travel.magnitude)
+            {
+                card.SetActive(false);
+            }
+        }
     }
 
     void ShowMessage(string text, Color color)
