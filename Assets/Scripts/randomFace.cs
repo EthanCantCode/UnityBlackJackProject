@@ -91,6 +91,8 @@ public class randomFace : MonoBehaviour
         pCardsSpawned = 0;
         dCardsSpawned = 0;
         hiddenCard = null;
+        dAces = 0;
+        pAces = 0;
     }
 
     // Flips the dealer's face-down card, so its value counts in the shown score
@@ -130,7 +132,7 @@ public class randomFace : MonoBehaviour
             int blackjackValue = cardCalc(cardValue);
             //Debug.Log(cardName + " = " + blackjackValue);
             pScore += blackjackValue;
-            lastDealerValue = blackjackValue;
+            
 
 
             //Auto Ace value converter
@@ -144,7 +146,9 @@ public class randomFace : MonoBehaviour
             {
                 pScore -= 10;
                 pAces--;
-            }            
+            }
+
+                        
 
 
             //Basic blackjack check (will probably be removed in the future)
@@ -195,6 +199,20 @@ public class randomFace : MonoBehaviour
             int blackjackValue = cardCalc(cardValue);
             dScore += blackjackValue;
             lastDealerValue = blackjackValue;
+
+            //Auto Ace value converter
+            if (cardValue == "ace")
+            {
+                dAces++;
+            }
+
+            // While the hand is over 21 and an ace is still worth 11, turn that ace into a 1
+            while (dScore > 21 && dAces > 0)
+            {
+                dScore -= 10;
+                dAces--;
+            }
+
 
 
             //Basic blackjack check (will probably be removed in the future)

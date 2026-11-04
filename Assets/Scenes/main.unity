@@ -804,6 +804,7 @@ GameObject:
   - component: {fileID: 915395753}
   - component: {fileID: 915395752}
   - component: {fileID: 915395755}
+  - component: {fileID: 915395756}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -930,6 +931,19 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!114 &915395756
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 915395751}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6803b979ed2ae42d5b2823a94fa66da2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Letterbox
+  targetAspect: 1.7777778
 --- !u!1 &971553970
 GameObject:
   m_ObjectHideFlags: 0
@@ -959,7 +973,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 950}
-  m_LocalScale: {x: 1950.1608, y: 1096.9655, z: 1}
+  m_LocalScale: {x: 1918.9583, y: 1096.9655, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 915395754}
@@ -1206,7 +1220,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 676, y: 40}
+  m_AnchoredPosition: {x: 599, y: 40}
   m_SizeDelta: {x: -1604.7332, y: -935.38904}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1481722236
@@ -1295,7 +1309,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -242.44214, y: 0, z: 205.19763, w: 0}
+  m_margin: {x: -242.44214, y: 0, z: 157.78232, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
