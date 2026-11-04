@@ -23,7 +23,9 @@ public class randomFace : MonoBehaviour
 
     // Every card currently in each hand (used to shift them over)
     public List<GameObject> playerCards = new List<GameObject>();
+    public int pAces = 0;
     public List<GameObject> dealerCards = new List<GameObject>();
+    public int dAces = 0;
 
     // True while a card is being dealt, so the player can't hit mid-deal
     public bool isDealing = false;
@@ -128,6 +130,21 @@ public class randomFace : MonoBehaviour
             int blackjackValue = cardCalc(cardValue);
             //Debug.Log(cardName + " = " + blackjackValue);
             pScore += blackjackValue;
+            lastDealerValue = blackjackValue;
+
+
+            //Auto Ace value converter
+            if (cardValue == "ace")
+            {
+                pAces++;
+            }
+
+            // While the hand is over 21 and an ace is still worth 11, turn that ace into a 1
+            while (pScore > 21 && pAces > 0)
+            {
+                pScore -= 10;
+                pAces--;
+            }            
 
 
             //Basic blackjack check (will probably be removed in the future)

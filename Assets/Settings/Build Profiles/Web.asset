@@ -574,6 +574,7 @@ MonoBehaviour:
     - line: '|   openGLRequireES32: 0'
     - line: '|   m_TemplateCustomTags:'
     - line: '|     PRIMARY_DATA_FILES: '
+    - line: '|     PRODUCT_DESCRIPTION: '
     - line: '|     SECONDARY_DATA_FILES: '
     - line: '|   mobileMTRendering:'
     - line: '|     Android: 1'

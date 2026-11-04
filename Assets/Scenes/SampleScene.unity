@@ -3972,6 +3972,10 @@ MonoBehaviour:
   resultBox: {fileID: 1678447183}
   resultText: {fileID: 643081192}
   resultShowTime: 1.5
+  leftHand: {fileID: 0}
+  sweepStartTime: 0.33
+  sweepClearTime: 0.67
+  walletCountTime: 0.6
   dealPulseSize: 0.06
   dealPulseSpeed: 4
   phase: 0
