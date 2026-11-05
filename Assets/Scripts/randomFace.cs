@@ -36,6 +36,7 @@ public class randomFace : MonoBehaviour
 
     //Dealing animation
     public Animation drawCard;
+    public Animation newRound;
     public float dealTime;
 
     public int pScore;//Player score
@@ -77,10 +78,15 @@ public class randomFace : MonoBehaviour
     // Clears the table and the scores before a new round
     public void ResetHands()
     {
+
+        
+
         foreach (GameObject card in playerCards)
         {
             Destroy(card);
         }
+
+        
         foreach (GameObject card in dealerCards)
         {
             Destroy(card);

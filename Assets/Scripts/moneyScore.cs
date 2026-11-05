@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Unity.VisualScripting;
 
 // Money side of the game: wallet, bets, round multiplier, payouts, high score,
 // plus the left dashboard and the bet controls on the bottom right.
@@ -70,6 +71,15 @@ public class moneyScore : MonoBehaviour
     public TMP_Text multText;
     public TMP_Text roundText;
     public TMP_Text highscoreText;
+
+    [Header("Audio Sources")]
+    public AudioSource win;
+    public AudioSource loose;
+    public AudioSource push;
+    public AudioSource draw;
+    public AudioSource betUp;
+    public AudioSource betDown;
+
 
     void Awake()
     {
@@ -205,6 +215,8 @@ public class moneyScore : MonoBehaviour
             return; // the bet is locked in once the round has started
         }
 
+        betUp.Play();
+
         betAmount += betSteps[stepIndex];
         ClampBet();
         UpdateDisplay();
@@ -217,6 +229,8 @@ public class moneyScore : MonoBehaviour
         {
             return;
         }
+
+        betDown.Play();
 
         betAmount -= betSteps[stepIndex];
         ClampBet();
