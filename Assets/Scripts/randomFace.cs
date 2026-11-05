@@ -23,8 +23,10 @@ public class randomFace : MonoBehaviour
 
     // Every card currently in each hand (used to shift them over)
     public List<GameObject> playerCards = new List<GameObject>();
+    public int pDisplayScore;
     public int pAces = 0;
     public List<GameObject> dealerCards = new List<GameObject>();
+    public int dDisplayScore;
     public int dAces = 0;
 
     // True while a card is being dealt, so the player can't hit mid-deal
@@ -93,6 +95,8 @@ public class randomFace : MonoBehaviour
         hiddenCard = null;
         dAces = 0;
         pAces = 0;
+        pDisplayScore = 0;
+        dDisplayScore = 0;
     }
 
     // Flips the dealer's face-down card, so its value counts in the shown score
@@ -102,7 +106,9 @@ public class randomFace : MonoBehaviour
         {
             hiddenCard.transform.rotation = Quaternion.identity;
             hiddenCard = null;
+            dDisplayScore = dealerShownScore;
         }
+        
     }
 
 
@@ -138,7 +144,7 @@ public class randomFace : MonoBehaviour
             //Auto Ace value converter
             if (cardValue == "ace")
             {
-                pAces++;
+                  pAces++;
             }
 
             // While the hand is over 21 and an ace is still worth 11, turn that ace into a 1
@@ -301,6 +307,9 @@ public IEnumerator DealCard(bool toPlayer, bool faceDown = false)
 
     // Wait long enough for the new card to reach its spot
     yield return new WaitForSeconds(0.5f);
+
+    pDisplayScore = pScore;
+    dDisplayScore = dealerShownScore;
 
     // Flip the card face up once it lands
     if (!faceDown)
