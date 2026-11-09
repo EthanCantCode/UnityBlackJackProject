@@ -20,6 +20,7 @@ public class randomFace : MonoBehaviour
     private GameObject hiddenCard;
 
     public float moveSpeed = 5f;
+    public float dealerClearDelay = 1f;
 
     // Every card currently in each hand (used to shift them over)
     public List<GameObject> playerCards = new List<GameObject>();
@@ -52,6 +53,8 @@ public class randomFace : MonoBehaviour
     // Value of the face-down dealer card, kept out of the dealer's shown score until it's revealed
     private int hiddenValue;
     private int lastDealerValue;
+
+    public AudioSource Adraw;
 
     // Dealer's score without the face-down card (what the player is allowed to see)
     public int dealerShownScore
@@ -86,11 +89,8 @@ public class randomFace : MonoBehaviour
             Destroy(card);
         }
 
-        
-        foreach (GameObject card in dealerCards)
-        {
-            Destroy(card);
-        }
+
+        StartCoroutine(deleteDealer(new List<GameObject>(dealerCards)));
 
         playerCards.Clear();
         dealerCards.Clear();
@@ -104,6 +104,21 @@ public class randomFace : MonoBehaviour
         pDisplayScore = 0;
         dDisplayScore = 0;
     }
+
+    // Plays the hand animation, waits until the hand covers the dealer's cards, then removes them
+IEnumerator deleteDealer(List<GameObject> cards)
+{
+    Debug.Log("deleteDealer started, waiting " + dealerClearDelay);
+
+    yield return new WaitForSeconds(dealerClearDelay);
+
+    Debug.Log("deleting " + cards.Count + " dealer cards");
+
+    foreach (GameObject card in cards)
+    {
+        Destroy(card);
+    }
+}
 
     // Flips the dealer's face-down card, so its value counts in the shown score
     public void RevealHiddenCard()
@@ -188,7 +203,7 @@ public class randomFace : MonoBehaviour
     //This section spawns the dealer cards
     GameObject spawnDealer(Vector3 position)
     {
-        
+
             GameObject newCard = Instantiate(cardPrefab, position, Quaternion.Euler(0,180,0));
 
             // Pick a random index from 0 to 51 (max is excluded for ints)
@@ -274,11 +289,14 @@ public IEnumerator DealCard(bool toPlayer, bool faceDown = false)
 
     // Frame 32 of the draw animation, converted to seconds
     float releaseTime = 32f / drawCard["draw"].clip.frameRate;
+    
 
     // Start the hand animation from the beginning
     drawCard.Stop();
     drawCard["draw"].wrapMode = WrapMode.Once;
     drawCard.Play("draw");
+
+
 
     // Spawn the card on the deck and pick which hand it goes to
     GameObject newCard;
@@ -310,6 +328,7 @@ public IEnumerator DealCard(bool toPlayer, bool faceDown = false)
     // Add the new card, then slide the whole hand into a centered row
     hand.Add(newCard);
     ArrangeHand(hand, landingSpot, !faceDown);
+    Adraw.Play();
 
     // Wait long enough for the new card to reach its spot
     yield return new WaitForSeconds(0.5f);

@@ -58,6 +58,10 @@ public class roundControl : MonoBehaviour
 
     public Phase phase = Phase.Betting;
 
+    [Header("Sound Audio")]
+    public AudioSource interact;
+    public AudioSource shuffle;
+
     Vector3 dealButtonScale = Vector3.one;
 
     void Start()
@@ -107,6 +111,9 @@ public class roundControl : MonoBehaviour
     // Deal button
     public void Deal()
     {
+
+        interact.Play();
+
         if (phase != Phase.Betting || cards.isDealing)
         {
             return;
@@ -143,6 +150,9 @@ public class roundControl : MonoBehaviour
     // Hit button
     public void Hit()
     {
+
+        interact.Play();
+
         if (phase != Phase.PlayerTurn || cards.isDealing)
         {
             return;
@@ -154,6 +164,9 @@ public class roundControl : MonoBehaviour
     // Stand button
     public void Stand()
     {
+
+        interact.Play();
+
         if (phase != Phase.PlayerTurn || cards.isDealing)
         {
             return;
@@ -273,6 +286,7 @@ public class roundControl : MonoBehaviour
         sweep.wrapMode = WrapMode.Once;
         leftHand.Stop();
         leftHand.Play("NewRound");
+        shuffle.Play();
         float started = Time.time;
 
         // Hand comes down onto the table

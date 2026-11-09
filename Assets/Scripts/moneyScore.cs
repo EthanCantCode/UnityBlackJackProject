@@ -76,9 +76,9 @@ public class moneyScore : MonoBehaviour
     public AudioSource win;
     public AudioSource loose;
     public AudioSource push;
-    public AudioSource draw;
     public AudioSource betUp;
     public AudioSource betDown;
+    public AudioSource interact;
 
 
     void Awake()
@@ -139,20 +139,24 @@ public class moneyScore : MonoBehaviour
         switch (result)
         {
             case RoundResult.Win:
+                win.Play();
                 Payout(winBaseMultiplier);
                 break;
 
             case RoundResult.Blackjack:
+                win.Play();
                 Payout(blackjackBaseMultiplier);
                 break;
 
             case RoundResult.Push:
+                push.Play();
                 wallet += currentBet;
                 lastPayout = currentBet;
                 Debug.Log("Push - bet returned");
                 break;
 
             case RoundResult.Lose:
+                loose.Play();
                 Debug.Log("Loss");
                 break;
         }
