@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using TMPro;
 
 // Round flow for the Deal, Hit and Stand buttons, on top of randomFace's dealing.
@@ -12,6 +13,8 @@ using TMPro;
 //          and pays the round out through moneyScore
 // When a round ends the result is shown for a moment, then the table clears
 // and the bet can be changed before Deal starts the next one.
+// On game over the game over screen comes up, and its PLAY AGAIN button (or Enter / R) reloads
+// the scene for a fresh game (the high score is kept, it's saved in PlayerPrefs).
 public class roundControl : MonoBehaviour
 {
     public enum Phase
@@ -64,12 +67,20 @@ public class roundControl : MonoBehaviour
 
     Vector3 dealButtonScale = Vector3.one;
 
+    // For the game over screen: the most money held this game, and whether it beat the saved high score
+    int bestWallet;
+    int highScoreAtStart;
+    gameOverScreen gameOverUI;
+
     void Start()
     {
         if (dealButton != null)
         {
             dealButtonScale = dealButton.transform.localScale;
         }
+
+        bestWallet = money.wallet;
+        highScoreAtStart = money.highScore;
 
         HideMessage();
     }
@@ -100,6 +111,13 @@ public class roundControl : MonoBehaviour
         SetInteractable(hitButton, canAct);
         SetInteractable(standButton, canAct);
 
+        // Keyboard shortcut for PLAY AGAIN on the game over screen
+        if (gameOverUI != null && Keyboard.current != null &&
+            (Keyboard.current.enterKey.wasPressedThisFrame || Keyboard.current.rKey.wasPressedThisFrame))
+        {
+            Replay();
+        }
+
         // Pulse DEAL while it's ready, so the player knows what to press without a prompt
         if (dealButton != null)
         {
@@ -126,6 +144,13 @@ public class roundControl : MonoBehaviour
         }
 
         StartCoroutine(OpeningDeal());
+    }
+
+    // Starts a fresh game: reloading the scene resets the wallet, min bet, round count, cards and hand.
+    // The high score is kept, since moneyScore saves it in PlayerPrefs
+    public void Replay()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     IEnumerator OpeningDeal()
@@ -214,6 +239,7 @@ public class roundControl : MonoBehaviour
         // Work out the payout now (the result text needs it), but the dashboard
         // only shows it when the hand wipes over the wallet
         money.ResolveRound(result, false);
+        bestWallet = Mathf.Max(bestWallet, money.wallet);
         StartCoroutine(ShowResult(result));
     }
 
@@ -262,11 +288,35 @@ public class roundControl : MonoBehaviour
         yield return StartCoroutine(SweepTable());
         phase = Phase.Betting;
 
-        // Game over stays on screen, since there's nothing left to deal
+        // Nothing left to deal, so bring up the game over screen
         if (money.gameOver)
         {
-            ShowMessage("GAME OVER", red);
+            ShowGameOver();
         }
+    }
+
+    void ShowGameOver()
+    {
+        if (gameOverUI != null)
+        {
+            return;
+        }
+
+        // Goes on the same canvas as the result banner, styled like it
+        Canvas canvas = resultText != null ? resultText.GetComponentInParent<Canvas>(true) : null;
+        if (canvas == null)
+        {
+            canvas = FindAnyObjectByType<Canvas>();
+        }
+        if (canvas == null)
+        {
+            Debug.LogWarning("No canvas for the game over screen");
+            return;
+        }
+
+        Image boxStyle = resultBox != null ? resultBox.GetComponent<Image>() : null;
+        gameOverUI = gameOverScreen.Show(canvas.rootCanvas, resultText, boxStyle,
+            money.roundNumber, bestWallet, money.highScore, money.highScore > highScoreAtStart, Replay);
     }
 
     // Plays the left hand's NewRound clip: it sweeps the cards off the table as it touches them,
