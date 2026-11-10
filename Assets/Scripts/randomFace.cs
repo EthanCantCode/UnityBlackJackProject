@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using System.Collections.Generic;
 
 
@@ -21,10 +20,15 @@ public class randomFace : MonoBehaviour
     private GameObject hiddenCard;
 
     public float moveSpeed = 5f;
+    public float dealerClearDelay = 1f;
 
     // Every card currently in each hand (used to shift them over)
     public List<GameObject> playerCards = new List<GameObject>();
+    public int pDisplayScore;
+    public int pAces = 0;
     public List<GameObject> dealerCards = new List<GameObject>();
+    public int dDisplayScore;
+    public int dAces = 0;
 
     // True while a card is being dealt, so the player can't hit mid-deal
     public bool isDealing = false;
@@ -33,6 +37,7 @@ public class randomFace : MonoBehaviour
 
     //Dealing animation
     public Animation drawCard;
+    public Animation newRound;
     public float dealTime;
 
     public int pScore;//Player score
@@ -45,52 +50,85 @@ public class randomFace : MonoBehaviour
     private int pCardsSpawned = 0;
     private int dCardsSpawned = 0;
 
-    void Start()
+    // Value of the face-down dealer card, kept out of the dealer's shown score until it's revealed
+    private int hiddenValue;
+    private int lastDealerValue;
+
+    public AudioSource Adraw;
+
+    // Dealer's score without the face-down card (what the player is allowed to see)
+    public int dealerShownScore
     {
-           
-        StartCoroutine(startOfRound());
-        
+        get { return hiddenCard != null ? dScore - hiddenValue : dScore; }
     }
 
-    IEnumerator startOfRound()
+    // The round is started by roundControl (Deal button), not when the scene loads
+    public IEnumerator startOfRound()
     {
-        
-       // Opening hand: player, dealer, player, dealer
+
+       // Opening hand: player, dealer, player, dealer (the dealer's second card stays face down)
     for (int i = 0; i < 2; i++)
     {
         yield return StartCoroutine(DealCard(true));
         //Debug.Log("drew player card");
 
-        yield return StartCoroutine(DealCard(false));
+        yield return StartCoroutine(DealCard(false, i == 1));
         //Debug.Log("Drew dealer card");
     }
 
     }
 
-
-
-
-    // Update is called once per frame
-    void Update()
+    // Clears the table and the scores before a new round
+    public void ResetHands()
     {
-        // Hit: deal a player card, but not while a card is already being dealt
-        if (Keyboard.current.spaceKey.wasPressedThisFrame && !isDealing)
+
+        
+
+        foreach (GameObject card in playerCards)
         {
-            StartCoroutine(DealCard(true));
+            Destroy(card);
         }
 
-        // Deal a dealer card (for testing)
-        if (Keyboard.current.dKey.wasPressedThisFrame && !isDealing)
-        {
-            StartCoroutine(DealCard(false));
-        }
 
-        // Replays the round
-        if (Keyboard.current.rKey.wasPressedThisFrame && !isDealing)
+        StartCoroutine(deleteDealer(new List<GameObject>(dealerCards)));
+
+        playerCards.Clear();
+        dealerCards.Clear();
+        pScore = 0;
+        dScore = 0;
+        pCardsSpawned = 0;
+        dCardsSpawned = 0;
+        hiddenCard = null;
+        dAces = 0;
+        pAces = 0;
+        pDisplayScore = 0;
+        dDisplayScore = 0;
+    }
+
+    // Plays the hand animation, waits until the hand covers the dealer's cards, then removes them
+IEnumerator deleteDealer(List<GameObject> cards)
+{
+    Debug.Log("deleteDealer started, waiting " + dealerClearDelay);
+
+    yield return new WaitForSeconds(dealerClearDelay);
+
+    Debug.Log("deleting " + cards.Count + " dealer cards");
+
+    foreach (GameObject card in cards)
+    {
+        Destroy(card);
+    }
+}
+
+    // Flips the dealer's face-down card, so its value counts in the shown score
+    public void RevealHiddenCard()
+    {
+        if (hiddenCard != null)
         {
-            StartCoroutine(startOfRound());
-            Debug.Log("R was pressed");
-        } 
+            hiddenCard.transform.rotation = Quaternion.identity;
+            hiddenCard = null;
+            dDisplayScore = dealerShownScore;
+        }
         
     }
 
@@ -121,12 +159,28 @@ public class randomFace : MonoBehaviour
             int blackjackValue = cardCalc(cardValue);
             //Debug.Log(cardName + " = " + blackjackValue);
             pScore += blackjackValue;
+            
+
+
+            //Auto Ace value converter
+            if (cardValue == "ace")
+            {
+                  pAces++;
+            }
+
+            // While the hand is over 21 and an ace is still worth 11, turn that ace into a 1
+            while (pScore > 21 && pAces > 0)
+            {
+                pScore -= 10;
+                pAces--;
+            }
+
+                        
 
 
             //Basic blackjack check (will probably be removed in the future)
             if (pScore > 21)
-            {   
-                pScore = 0;
+            {
                 Debug.Log("bust");
             }
             else if(pScore == 21)
@@ -149,7 +203,7 @@ public class randomFace : MonoBehaviour
     //This section spawns the dealer cards
     GameObject spawnDealer(Vector3 position)
     {
-        
+
             GameObject newCard = Instantiate(cardPrefab, position, Quaternion.Euler(0,180,0));
 
             // Pick a random index from 0 to 51 (max is excluded for ints)
@@ -171,12 +225,26 @@ public class randomFace : MonoBehaviour
 
             int blackjackValue = cardCalc(cardValue);
             dScore += blackjackValue;
+            lastDealerValue = blackjackValue;
+
+            //Auto Ace value converter
+            if (cardValue == "ace")
+            {
+                dAces++;
+            }
+
+            // While the hand is over 21 and an ace is still worth 11, turn that ace into a 1
+            while (dScore > 21 && dAces > 0)
+            {
+                dScore -= 10;
+                dAces--;
+            }
+
 
 
             //Basic blackjack check (will probably be removed in the future)
             if (dScore > 21)
-            {   
-                dScore = 0;
+            {
                 Debug.Log("Dealer bust");
             }
             else if(dScore == 21)
@@ -211,20 +279,24 @@ public class randomFace : MonoBehaviour
         }
 
 
-    // Deals one card to the player (true) or dealer (false), synced to the hand animation
-IEnumerator DealCard(bool toPlayer)
-{   
+    // Deals one card to the player (true) or dealer (false), synced to the hand animation.
+    // A faceDown card stays face down until RevealHiddenCard
+public IEnumerator DealCard(bool toPlayer, bool faceDown = false)
+{
     
     isDealing = true;
     float startTime = Time.time;
 
     // Frame 32 of the draw animation, converted to seconds
     float releaseTime = 32f / drawCard["draw"].clip.frameRate;
+    
 
     // Start the hand animation from the beginning
     drawCard.Stop();
     drawCard["draw"].wrapMode = WrapMode.Once;
     drawCard.Play("draw");
+
+
 
     // Spawn the card on the deck and pick which hand it goes to
     GameObject newCard;
@@ -242,6 +314,12 @@ IEnumerator DealCard(bool toPlayer)
         newCard = spawnDealer(cardSpawn.transform.position);
         hand = dealerCards;
         landingSpot = dealerHand;
+
+        if (faceDown)
+        {
+            hiddenCard = newCard;
+            hiddenValue = lastDealerValue;
+        }
     }
 
     // Wait until frame 32, when the hand releases the card
@@ -249,13 +327,20 @@ IEnumerator DealCard(bool toPlayer)
 
     // Add the new card, then slide the whole hand into a centered row
     hand.Add(newCard);
-    ArrangeHand(hand, landingSpot);
+    ArrangeHand(hand, landingSpot, !faceDown);
+    Adraw.Play();
 
     // Wait long enough for the new card to reach its spot
     yield return new WaitForSeconds(0.5f);
 
+    pDisplayScore = pScore;
+    dDisplayScore = dealerShownScore;
+
     // Flip the card face up once it lands
-    newCard.transform.rotation = Quaternion.identity;
+    if (!faceDown)
+    {
+        newCard.transform.rotation = Quaternion.identity;
+    }
 
     // Let the rest of the hand animation finish before the next deal
     float remaining = drawCard["draw"].length - (Time.time - startTime);
@@ -271,13 +356,13 @@ IEnumerator DealCard(bool toPlayer)
 }
 
 // Slides every card in a hand so they're evenly spaced and centered on the landing spot
-void ArrangeHand(List<GameObject> hand, Transform center)
+void ArrangeHand(List<GameObject> hand, Transform center, bool flipNewest)
 {
     for (int i = 0; i < hand.Count; i++)
     {
         float offset = (i - (hand.Count - 1) / 2f) * cardSpacing;
         Vector3 target = center.position + new Vector3(0, 0, offset);
-        bool isNewest = (i == hand.Count - 1);
+        bool isNewest = flipNewest && (i == hand.Count - 1);
         StartCoroutine(MoveCard(hand[i], target, isNewest));
     }
 }

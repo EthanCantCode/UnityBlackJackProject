@@ -1,6 +1,8 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Unity.VisualScripting;
 
 // Money side of the game: wallet, bets, round multiplier, payouts, high score,
 // plus the left dashboard and the bet controls on the bottom right.
@@ -22,6 +24,10 @@ public class moneyScore : MonoBehaviour
     public int wallet = 1000;
     public float minBet = 10f;
     public int currentBet = 0;
+
+    // What the wallet box shows. During a round it still includes the bet; CountWallet catches it up
+    // to the real wallet when the hand wipes over it, so the money visibly goes in or out
+    int shownWallet;
 
     [Header("Rounds")]
     public int roundNumber = 0;
@@ -66,6 +72,15 @@ public class moneyScore : MonoBehaviour
     public TMP_Text roundText;
     public TMP_Text highscoreText;
 
+    [Header("Audio Sources")]
+    public AudioSource win;
+    public AudioSource loose;
+    public AudioSource push;
+    public AudioSource betUp;
+    public AudioSource betDown;
+    public AudioSource interact;
+
+
     void Awake()
     {
         highScore = PlayerPrefs.GetInt("HighScore", wallet);
@@ -76,6 +91,7 @@ public class moneyScore : MonoBehaviour
 
     void Start()
     {
+        shownWallet = wallet;
         ClampBet();
         UpdateDisplay();
     }
@@ -113,7 +129,9 @@ public class moneyScore : MonoBehaviour
         return true;
     }
 
-    public void ResolveRound(RoundResult result)
+    // updateDisplay false works out the payout but leaves the dashboard showing the old numbers
+    // until CountWallet runs (roundControl does that when the hand wipes over the wallet)
+    public void ResolveRound(RoundResult result, bool updateDisplay = true)
     {
         roundNumber++;
         lastPayout = 0;
@@ -121,20 +139,24 @@ public class moneyScore : MonoBehaviour
         switch (result)
         {
             case RoundResult.Win:
+                win.Play();
                 Payout(winBaseMultiplier);
                 break;
 
             case RoundResult.Blackjack:
+                win.Play();
                 Payout(blackjackBaseMultiplier);
                 break;
 
             case RoundResult.Push:
+                push.Play();
                 wallet += currentBet;
                 lastPayout = currentBet;
                 Debug.Log("Push - bet returned");
                 break;
 
             case RoundResult.Lose:
+                loose.Play();
                 Debug.Log("Loss");
                 break;
         }
@@ -158,7 +180,11 @@ public class moneyScore : MonoBehaviour
 
         // The wallet and min bet just changed, so the next bet may need adjusting
         ClampBet();
-        UpdateDisplay();
+        if (updateDisplay)
+        {
+            shownWallet = wallet;
+            UpdateDisplay();
+        }
     }
 
     void CheckGameOver()
@@ -193,6 +219,8 @@ public class moneyScore : MonoBehaviour
             return; // the bet is locked in once the round has started
         }
 
+        betUp.Play();
+
         betAmount += betSteps[stepIndex];
         ClampBet();
         UpdateDisplay();
@@ -205,6 +233,8 @@ public class moneyScore : MonoBehaviour
         {
             return;
         }
+
+        betDown.Play();
 
         betAmount -= betSteps[stepIndex];
         ClampBet();
@@ -229,7 +259,7 @@ public class moneyScore : MonoBehaviour
     void UpdateDisplay()
     {
         // Left dashboard, top to bottom. Each value goes in its own box on the table
-        SetText(walletText, "Wallet\n$" + wallet);
+        SetText(walletText, "Wallet\n$" + shownWallet);
         SetText(payoutText, "Payout\n$" + lastPayout);
         SetText(winAmtText, "Win\n$" + lastWinAmount);
         SetText(betMinText, "Bet Min\n$" + Mathf.CeilToInt(minBet));
@@ -251,6 +281,34 @@ public class moneyScore : MonoBehaviour
                 }
             }
         }
+    }
+
+    // Updates the dashboard, then counts the wallet box from what it shows to the real wallet.
+    // The box pops and flashes green (money in) or red (money out), then settles back to white
+    public IEnumerator CountWallet(float duration)
+    {
+        int from = shownWallet;
+        UpdateDisplay(); // the other boxes update now; the wallet box still shows the old amount
+
+        if (walletText != null && from != wallet)
+        {
+            Color flash = wallet > from ? new Color(0.3f, 0.9f, 0.4f) : new Color(1f, 0.35f, 0.3f);
+            for (float t = 0; t < duration; t += Time.deltaTime)
+            {
+                float k = t / duration;
+                shownWallet = Mathf.RoundToInt(Mathf.Lerp(from, wallet, k));
+                SetText(walletText, "Wallet\n$" + shownWallet);
+                walletText.color = Color.Lerp(flash, Color.white, k);
+                walletText.transform.localScale = Vector3.one * (1f + 0.25f * (1f - k)); // pops big, then settles
+                yield return null;
+            }
+
+            walletText.color = Color.white;
+            walletText.transform.localScale = Vector3.one;
+        }
+
+        shownWallet = wallet;
+        UpdateDisplay();
     }
 
     void SetText(TMP_Text box, string text)
