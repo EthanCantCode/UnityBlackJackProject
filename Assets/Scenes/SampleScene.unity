@@ -4836,7 +4836,7 @@ MonoBehaviour:
   currentBet: 0
   roundNumber: 0
   gameOver: 0
-  minRandomMultiplier: 1
+  minRandomMultiplier: 2
   maxRandomMultiplier: 5
   winBaseMultiplier: 1
   blackjackBaseMultiplier: 1.5
