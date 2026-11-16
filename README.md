@@ -20,7 +20,7 @@ A 3D blackjack game built in Unity for **UNT CSCE 1010**.
 ## How the game works
 The game is like blackjack with a few different premises
 1. Aces will automatically change to either 1 or 11 for the user and dealer
-2. A multiplier that randomly changes from 1-5x to entice the player to bet more
+2. A multiplier that randomly changes from 2-5x to entice the player to bet more
 3. Every round the ante will rise putting some pressure on the player
 4. The game is endless and will only end if you cant put in the minimum ante for the round
 
