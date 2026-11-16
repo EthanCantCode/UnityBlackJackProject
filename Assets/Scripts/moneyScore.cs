@@ -14,8 +14,9 @@ public class moneyScore : MonoBehaviour
 {
     public enum RoundResult
     {
-        Win,
+
         Blackjack,
+        Win,
         Push,
         Lose
     }
@@ -138,14 +139,15 @@ public class moneyScore : MonoBehaviour
 
         switch (result)
         {
-            case RoundResult.Win:
-                win.Play();
-                Payout(winBaseMultiplier);
-                break;
 
             case RoundResult.Blackjack:
                 win.Play();
                 Payout(blackjackBaseMultiplier);
+                break;
+
+            case RoundResult.Win:
+                win.Play();
+                Payout(winBaseMultiplier);
                 break;
 
             case RoundResult.Push:
@@ -323,11 +325,11 @@ public class moneyScore : MonoBehaviour
     [ContextMenu("Test/Place Bet")]
     void TestPlaceBet() => PlaceBet();
 
-    [ContextMenu("Test/Win")]
-    void TestWin() => ResolveRound(RoundResult.Win);
-
     [ContextMenu("Test/Blackjack")]
     void TestBlackjack() => ResolveRound(RoundResult.Blackjack);
+
+    [ContextMenu("Test/Win")]
+    void TestWin() => ResolveRound(RoundResult.Win);
 
     [ContextMenu("Test/Push")]
     void TestPush() => ResolveRound(RoundResult.Push);

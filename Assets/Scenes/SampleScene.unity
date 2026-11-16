@@ -4839,7 +4839,7 @@ MonoBehaviour:
   minRandomMultiplier: 2
   maxRandomMultiplier: 5
   winBaseMultiplier: 1
-  blackjackBaseMultiplier: 1.5
+  blackjackBaseMultiplier: 5
   currentMultiplier: 1
   lastPayout: 0
   lastWinAmount: 0
